@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/batch_test
+    username: root
+    password: root
+    driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      # pool size = Tn * (Cm - 1) + (Tn / 2)
+      maximum-pool-size: 24
+  jpa:
+#    hibernate:
+#      ddl-auto: create
+    show-sql: true
+  batch:
+    job:
+      enabled: false
