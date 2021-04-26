@@ -42,3 +42,4 @@ src/main/resources/database-schema.sql
 - https://woowabros.github.io/experience/2020/02/06/hikaricp-avoid-dead-lock.html
 - https://stackoverflow.com/questions/4932503/how-to-kill-mysql-connections
 - https://www.toptal.com/spring/spring-batch-tutorial
+- https://jojoldu.tistory.com/487
