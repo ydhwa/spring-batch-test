@@ -2,6 +2,7 @@ package com.example.springbatchtest.job;
 
 import com.example.springbatchtest.domain.TestData;
 import com.example.springbatchtest.job.reader.QuerydslPagingItemReader;
+import com.example.springbatchtest.job.tasklet.DeleteJobRepositoryTasklet;
 import com.example.springbatchtest.service.TestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +12,17 @@ import org.springframework.batch.core.configuration.annotation.DefaultBatchConfi
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -39,15 +45,37 @@ public class TestJobConfig extends DefaultBatchConfigurer {
     private final TestService testService;
 
 
-    @Override
-    public void setDataSource(DataSource dataSource) {
-        super.setDataSource(null);
+    public DataSource embeddedDataSource() {
+        return new EmbeddedDatabaseBuilder()
+                .addScript("classpath:schema-drop-create-h2-job.sql")
+                .setType(EmbeddedDatabaseType.H2)
+                .build();
     }
+
+    @Override
+    protected JobRepository createJobRepository() throws Exception {
+        JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+        factory.setDataSource(embeddedDataSource());
+        factory.setTransactionManager(transactionManager());
+        factory.afterPropertiesSet();
+        factory.setValidateTransactionState(false);
+        return factory.getObject();
+    }
+
+    private ResourcelessTransactionManager transactionManager() {
+        return new ResourcelessTransactionManager();
+    }
+
 
     @Bean
     public Job testJob() {
+        Step deleteJobRepositoryTaskletStep = stepBuilderFactory.get("deleteJobRepositoryTasklet")
+                .tasklet(new DeleteJobRepositoryTasklet(embeddedDataSource()))
+                .build();
+
         return jobBuilderFactory.get("testJob")
                 .start(testStep())
+                .next(deleteJobRepositoryTaskletStep)
                 .build();
     }
 

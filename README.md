@@ -15,7 +15,8 @@ Spring Batch 테스트
    - ex) 10개씩 끊어서 동시 처리
    - ***chunk 단위로 처리 가능하다.***
 2. Batch Metadata 테이블을 RDB에서 생성하지 않고 처리할 수 있는가?
-   - ***Job에서 DefaultBatchConfigurer를 상속받고, dataSource에 null 값을 세팅하면 Map 기반의 JobRepository가 실행된다.***
+   - ~~***Job에서 DefaultBatchConfigurer를 상속받고, dataSource에 null 값을 세팅하면 Map 기반의 JobRepository가 실행된다.***~~
+   - In-memory Database 기반 Job Repository 사용 
 3. Reader에서 Querydsl 도입이 가능한가?
    - ***ItemReader를 직접 구현하여 사용해야 한다. (JpaPagingItemReader base로 구현)***
 
@@ -25,11 +26,15 @@ Spring Batch 테스트
 - Spring Data JPA
 - MariaDB 10.3
 - Querydsl
+- H2
 
 ## Database
 ```
 src/main/resources/database-schema.sql
 ```
+
+## H2 Console
+- http://localhost:8080/h2-console
 
 ## Reference
 - https://docs.spring.io/spring-batch/docs/current/reference/html/index.html
@@ -43,3 +48,5 @@ src/main/resources/database-schema.sql
 - https://stackoverflow.com/questions/4932503/how-to-kill-mysql-connections
 - https://www.toptal.com/spring/spring-batch-tutorial
 - https://jojoldu.tistory.com/487
+- https://stackoverflow.com/questions/26302304/does-spring-batch-job-repository-with-resource-less-trx-manager-keep-state-in-me
+- https://stackoverflow.com/questions/52949088/h2-db-not-accessible-at-localhost8080-h2-console-when-using-webflux

@@ -32,6 +32,8 @@ dependencies {
 	// querydsl
 	compile("com.querydsl:querydsl-core")
 	compile("com.querydsl:querydsl-jpa")
+
+	runtimeOnly 'com.h2database:h2'
 }
 
 test {
